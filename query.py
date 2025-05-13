@@ -1,7 +1,4 @@
 import sqlite3
-import json
-import re
-
 
 # Example usage
 def query_pubmed_data(db_file, pubmed_id):
@@ -34,7 +31,7 @@ def query_pubmed_data(db_file, pubmed_id):
 
 
 if __name__ == "__main__":
-     data = query_pubmed_data("pubmed_data.db", "16602100") # Replace with a valid PubMed ID
+     data = query_pubmed_data("data/pubmed_data.db", "16602100") # Replace with a valid PubMed ID
      if data != "0":
          with open("output.txt", "w") as file:
              file.write(data)
