@@ -16,25 +16,33 @@ def pubtator_to_conll(input_dir, output_dir):
 
             lines = pubtator_text.strip().split("\n")
 
+            # Ignore the last 3 lines
             lines = lines[:-3]
 
+            # Extract the paragraph text
             paragraph = ""
             for line in lines:
                 if "|a|" in line:
                     paragraph = line.split("|a|")[1]
                     break
 
+            # Replace "/" with a space in the paragraph
+            paragraph = paragraph.replace("/", " ")
+
+            # Extract annotations (focus on Column 4 and Column 5 for 6-column lines)
             annotations = []
             for line in lines:
                 parts = line.split("\t")
                 if len(parts) == 6:  
-                    entity_text = parts[3]
+                    entity_text = parts[3].replace("/", " ")  # Replace "/" with a space in the entity text
                     entity_type = parts[4]
                     annotations.append((entity_text, entity_type))
 
+            # Tokenize the paragraph and initialize tags
             tokens = paragraph.split()
             tags = ["O"] * len(tokens)
 
+            # Normalize tokens
             normalized_tokens = [re.sub(r'[^\w]', '', token).lower() for token in tokens]
 
             for entity_text, entity_type in annotations:
@@ -47,6 +55,7 @@ def pubtator_to_conll(input_dir, output_dir):
                         for j in range(1, len(normalized_entity_tokens)):
                             tags[i + j] = f"I-{entity_type}"
 
+            # Format the output in CoNLL format
             conll_lines = []
             for token, tag in zip(tokens, tags):
                 conll_lines.append(f"{token} {tag}")
@@ -55,6 +64,7 @@ def pubtator_to_conll(input_dir, output_dir):
 
             conll_output = "\n".join(conll_lines)
 
+            # Save the CoNLL output to the output file
             with open(output_file, "w") as f:
                 f.write(conll_output)
 
