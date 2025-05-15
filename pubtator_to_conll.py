@@ -16,17 +16,20 @@ def pubtator_to_conll(input_dir, output_dir):
 
             lines = pubtator_text.strip().split("\n")
 
-            # Ignore the last 3 lines
+            # Ignore the last 3 lines (relation annotations)
             lines = lines[:-3]
 
-            # Extract the paragraph text
+            # Extract the title and abstract
+            title = ""
             paragraph = ""
             for line in lines:
-                if "|a|" in line:
+                if "|t|" in line:
+                    title = line.split("|t|")[1]
+                elif "|a|" in line:
                     paragraph = line.split("|a|")[1]
-                    break
 
-            # Replace "/" with a space in the paragraph
+            # Replace "/" with a space in the title and paragraph
+            title = title.replace("/", " ")
             paragraph = paragraph.replace("/", " ")
 
             # Extract annotations (focus on Column 4 and Column 5 for 6-column lines)
@@ -38,8 +41,9 @@ def pubtator_to_conll(input_dir, output_dir):
                     entity_type = parts[4]
                     annotations.append((entity_text, entity_type))
 
-            # Tokenize the paragraph and initialize tags
-            tokens = paragraph.split()
+            # Combine title and paragraph for tokenization and tagging
+            full_text = f"{title} {paragraph}"
+            tokens = full_text.split()
             tags = ["O"] * len(tokens)
 
             # Normalize tokens
@@ -57,7 +61,16 @@ def pubtator_to_conll(input_dir, output_dir):
 
             # Format the output in CoNLL format
             conll_lines = []
-            for token, tag in zip(tokens, tags):
+
+            # Add title to CoNLL output with a marker
+            conll_lines.append("# Title")
+            for token, tag in zip(tokens[:len(title.split())], tags[:len(title.split())]):
+                conll_lines.append(f"{token} {tag}")
+            conll_lines.append("")  # Blank line after title
+
+            # Add abstract to CoNLL output
+            conll_lines.append("# Abstract")
+            for token, tag in zip(tokens[len(title.split()):], tags[len(title.split()):]):
                 conll_lines.append(f"{token} {tag}")
                 if token in ".!?":  
                     conll_lines.append("")
@@ -72,5 +85,5 @@ def pubtator_to_conll(input_dir, output_dir):
 
 if __name__ == "__main__":
     input_dir = "data/pubmed_responses"  
-    output_dir = "data/conll_out"
+    output_dir = "data/conll_out_title"
     pubtator_to_conll(input_dir, output_dir)

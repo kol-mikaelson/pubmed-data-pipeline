@@ -5,7 +5,7 @@ from concurrent.futures import ThreadPoolExecutor
 client = Pycaprio("http://localhost:8080/", authentication=("remote", "remoteuser"))
 
 # List projects
-project_name = "finalnerproject"
+project_name = "finalnerproject1234"
 existing_projects = client.api.projects()
 try:
     new_project = client.api.create_project(project_name)
@@ -33,7 +33,7 @@ def process_file(file_path, filename):
             print(f"An error occurred while processing {filename}: {e}")
 
 # Import all files from a given directory in CONLL 2002 format using multi-threading
-directory_path = "data/conll_out"
+directory_path = "data/conll_out_title/"
 with ThreadPoolExecutor() as executor:
     for filename in os.listdir(directory_path):
         file_path = os.path.join(directory_path, filename)
