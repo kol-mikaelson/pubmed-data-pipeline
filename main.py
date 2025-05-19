@@ -1,9 +1,7 @@
-
 import requests
 import time
 import os
 
-# Define the API URL
 API_URL = "https://www.ncbi.nlm.nih.gov/research/pubtator3-api/publications/export/pubtator?pmids="
 
 def fetch_pubmed_data_to_files(pubmed_ids_file, output_dir):
